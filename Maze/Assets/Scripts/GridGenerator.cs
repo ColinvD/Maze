@@ -43,12 +43,7 @@ public class GridGenerator : MonoBehaviour
         verticalWalls = new GameObject[width + 1, height];
         SpawnRooms();
         SpawnWalls();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        InitializeRooms();
     }
 
     private void SpawnRooms() {
@@ -79,6 +74,18 @@ public class GridGenerator : MonoBehaviour
                 GameObject mazeWall = Instantiate(wall, pos, new Quaternion(), mazeParent);
                 mazeWall.transform.localScale = new Vector3(0.5f, 1, 2.5f);
                 verticalWalls[i, j] = mazeWall;
+            }
+        }
+    }
+
+    private void InitializeRooms() {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                RoomData data = grid[i, j].GetComponent<RoomData>();
+                data.AddWall(RoomData.WallDir.North, horizontalWalls[i, j + 1]);
+                data.AddWall(RoomData.WallDir.East, verticalWalls[i, j+1]);
+                data.AddWall(RoomData.WallDir.South, horizontalWalls[i, j]);
+                data.AddWall(RoomData.WallDir.West, verticalWalls[i, j]);
             }
         }
     }
