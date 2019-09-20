@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
-    public int width = 5;
-    public int height = 5;
+    private int width = 5;
+    private int height = 5;
     private GameObject[,] grid;
     [SerializeField]
     private GameObject room;
-    private GameObject[,] horizontalWalls;
-    private GameObject[,] verticalWalls;
     [SerializeField]
     private GameObject wall;
     [SerializeField]
     private Transform mazeParent;
+    private GameObject[,] horizontalWalls;
+    private GameObject[,] verticalWalls;
 
     public int Width {
         get { return width; }
@@ -38,8 +38,21 @@ public class GridGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Grid = new GameObject[width,height];
-        horizontalWalls = new GameObject[width, height+1];
+        
+    }
+
+    private void DestroyMaze() {
+        foreach (Transform child in mazeParent) {
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void GenerateMaze(int newWidth, int newHeight) {
+        DestroyMaze();
+        Width = newWidth;
+        Height = newHeight;
+        Grid = new GameObject[width, height];
+        horizontalWalls = new GameObject[width, height + 1];
         verticalWalls = new GameObject[width + 1, height];
         SpawnRooms();
         SpawnWalls();
