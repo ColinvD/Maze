@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
-    private int width = 5;
-    private int height = 5;
+    public int width = 5;
+    public int height = 5;
     private GameObject[,] grid;
     [SerializeField]
     private GameObject room;
@@ -82,8 +82,9 @@ public class GridGenerator : MonoBehaviour
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 RoomData data = grid[i, j].GetComponent<RoomData>();
+                data.InitializeData();
                 data.AddWall(RoomData.WallDir.North, horizontalWalls[i, j + 1]);
-                data.AddWall(RoomData.WallDir.East, verticalWalls[i, j+1]);
+                data.AddWall(RoomData.WallDir.East, verticalWalls[i+1, j]);
                 data.AddWall(RoomData.WallDir.South, horizontalWalls[i, j]);
                 data.AddWall(RoomData.WallDir.West, verticalWalls[i, j]);
             }

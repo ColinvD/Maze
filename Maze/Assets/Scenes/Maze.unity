@@ -322,6 +322,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55dafeeaf2351714eac90c988e351b26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  width: 5
+  height: 5
   room: {fileID: 158719043226109645, guid: 66ffe221c5100c04dbffcdd8d6584308, type: 3}
   wall: {fileID: 7509173316638433487, guid: 357fae4e8af85c647ba15fab2677920e, type: 3}
   mazeParent: {fileID: 79997343}

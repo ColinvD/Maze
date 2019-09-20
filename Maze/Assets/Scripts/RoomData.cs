@@ -26,8 +26,11 @@ public class RoomData : MonoBehaviour
         }
     }
 
+    public void InitializeData() {
+        walls = new Dictionary<WallDir, GameObject>();
+    }
+
     public void AddWall(WallDir direction, GameObject wall) {
-        Debug.Log("Dir: " + direction + " wall: " + wall);
         walls.Add(direction, wall);
     }
 }
