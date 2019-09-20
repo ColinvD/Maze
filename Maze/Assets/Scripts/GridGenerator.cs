@@ -6,7 +6,7 @@ public class GridGenerator : MonoBehaviour
 {
     private int width = 5;
     private int height = 5;
-    private GameObject[,] grid;
+    private RoomData[,] grid;
     [SerializeField]
     private GameObject room;
     [SerializeField]
@@ -28,17 +28,11 @@ public class GridGenerator : MonoBehaviour
             height = value;
         }
     }
-    public GameObject[,] Grid {
+    public RoomData[,] Grid {
         get { return grid; }
         private set {
             grid = value;
         }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
     }
 
     private void DestroyMaze() {
@@ -51,7 +45,7 @@ public class GridGenerator : MonoBehaviour
         DestroyMaze();
         Width = newWidth;
         Height = newHeight;
-        Grid = new GameObject[width, height];
+        Grid = new RoomData[width, height];
         horizontalWalls = new GameObject[width, height + 1];
         verticalWalls = new GameObject[width + 1, height];
         SpawnRooms();
@@ -64,7 +58,7 @@ public class GridGenerator : MonoBehaviour
             for (int j = 0; j < height; j++) {
                 Vector3 pos = new Vector3(i * 2, 0, j * 2);
                 GameObject mazeRoom = Instantiate(room, pos, new Quaternion(), mazeParent);
-                grid[i, j] = mazeRoom;
+                grid[i, j] = mazeRoom.GetComponent<RoomData>();
             }
         }
     }
