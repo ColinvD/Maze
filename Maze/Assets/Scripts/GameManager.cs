@@ -23,6 +23,6 @@ public class GameManager : MonoBehaviour
 
     public void Generate() {
         gridGen.GenerateMaze(uihandler.GetWidthInput(), uihandler.GetHeightInput());
-        mazeGen.GenerateMaze();
+        StartCoroutine(mazeGen.GenerateMaze());
     }
 }

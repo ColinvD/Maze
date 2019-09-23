@@ -11,6 +11,7 @@ public class RoomData : MonoBehaviour
         South
     }
     private Dictionary<WallDir, GameObject> walls;
+    public List<WallDir> test;
     private int distance;
     private bool visited = false;
     public int Distance {
@@ -28,14 +29,17 @@ public class RoomData : MonoBehaviour
 
     public void InitializeData() {
         walls = new Dictionary<WallDir, GameObject>();
+        test = new List<WallDir>();
     }
 
     public void AddWall(WallDir direction, GameObject wall) {
         walls.Add(direction, wall);
+        test.Add(direction);
     }
 
     public void RemoveWall(WallDir direction) {
         walls.Remove(direction);
+        test.Remove(direction);
     }
 
     public bool ContainsWall(WallDir direction) {

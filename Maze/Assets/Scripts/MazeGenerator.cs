@@ -6,9 +6,12 @@ public class MazeGenerator : MonoBehaviour
 {
     private GridGenerator generator;
     private RoomData curChecking;
+    [SerializeField]
     private RoomData startRoom;
+    private RoomData endRoom;
     private List<RoomData> path;
     private List<RoomData> outside;
+    //private List<RoomData> rankList;
     private int distance = 0;
     private int currentX = 0;
     private int currentY = 0;
@@ -20,19 +23,16 @@ public class MazeGenerator : MonoBehaviour
     }
 
     public void MakeEnds() {
-        List<RoomData> rankList = new List<RoomData>();
-        rankList.Add(startRoom);
+        if (endRoom == null) {
+            endRoom = startRoom;
+        }
         for (int i = 0; i < outside.Count; i++) {
-            for (int j = 0; j < rankList.Count; j++) {
-                if (outside[i].Distance > rankList[j].Distance) {
-                    rankList.Insert(j, outside[i]);
-                } else {
-                    rankList.Add(outside[i]);
-                }
+            if(outside[i].Distance > endRoom.Distance) {
+                endRoom = outside[i];
             }
         }
         startRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
-        rankList[Random.Range(0, (int)rankList.Count / 2)].gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+        endRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
     }
 
     private void GetRandomStart() {
@@ -71,7 +71,7 @@ public class MazeGenerator : MonoBehaviour
         startRoom = curChecking;
     }
 
-    public void GenerateMaze() {
+    public IEnumerator GenerateMaze() {
         path = new List<RoomData>();
         GetRandomStart(); //Get a random starting room
         while (path.Count > 0) {
@@ -85,11 +85,20 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
             if (directions.Count != 0) { //checkt als ik nog naar een direction kan
+                ChangeColor(curChecking, Color.yellow);
                 CheckRoom(directions[GetRandomDir(directions.Count)]); //check die direction
-            } else {
+            } else if (path.Count - 1 > 0) {
+                ChangeColor(curChecking, Color.white);
+                distance--;
                 path.Remove(path[path.Count - 1]); //haal deze kamer uit het pad
                 curChecking = path[path.Count - 1]; //en ga naar de vorige kamer
+                ChangeColor(curChecking, Color.yellow);
+            } else {
+                ChangeColor(curChecking, Color.white);
+                break;
+                path.Remove(path[path.Count - 1]);
             }
+            yield return new WaitForSeconds(0.3f);
         }
         MakeEnds();
     }
@@ -98,11 +107,13 @@ public class MazeGenerator : MonoBehaviour
         switch (direction) {
             case RoomData.WallDir.North:
                 if (!generator.Grid[currentX,currentY + 1].Visited) { //als hij nog niet is bezocht
+                    ChangeColor(curChecking, Color.magenta);
                     Destroy(curChecking.GetWall(direction)); //muur vernietigen
                     curChecking.RemoveWall(direction); //haal bij de huidige kamer de muur weg
                     generator.Grid[currentX, currentY + 1].RemoveWall(RoomData.WallDir.South); //haal bij de volgende kamer dezelfde muur weg
                     path.Add(generator.Grid[currentX, currentY + 1]); //voeg de volgende kamer toe aan het pad
                     curChecking = generator.Grid[currentX, currentY + 1]; //zet die kamer als de huidige die gecheckt word
+                    ChangeColor(curChecking, Color.yellow);
                     curChecking.Visited = true;
                     distance++;
                     curChecking.Distance = distance;
@@ -112,11 +123,13 @@ public class MazeGenerator : MonoBehaviour
                 break;
             case RoomData.WallDir.East:
                 if (!generator.Grid[currentX + 1, currentY].Visited) {
+                    ChangeColor(curChecking, Color.magenta);
                     Destroy(curChecking.GetWall(direction));
                     curChecking.RemoveWall(direction);
                     generator.Grid[currentX + 1, currentY].RemoveWall(RoomData.WallDir.West);
                     path.Add(generator.Grid[currentX + 1, currentY]);
                     curChecking = generator.Grid[currentX + 1, currentY];
+                    ChangeColor(curChecking, Color.yellow);
                     curChecking.Visited = true;
                     distance++;
                     curChecking.Distance = distance;
@@ -126,11 +139,13 @@ public class MazeGenerator : MonoBehaviour
                 break;
             case RoomData.WallDir.South:
                 if (!generator.Grid[currentX, currentY - 1].Visited) {
+                    ChangeColor(curChecking, Color.magenta);
                     Destroy(curChecking.GetWall(direction));
                     curChecking.RemoveWall(direction);
                     generator.Grid[currentX, currentY - 1].RemoveWall(RoomData.WallDir.North);
                     path.Add(generator.Grid[currentX, currentY - 1]);
                     curChecking = generator.Grid[currentX, currentY - 1];
+                    ChangeColor(curChecking, Color.yellow);
                     curChecking.Visited = true;
                     distance++;
                     curChecking.Distance = distance;
@@ -140,11 +155,13 @@ public class MazeGenerator : MonoBehaviour
                 break;
             case RoomData.WallDir.West:
                 if (!generator.Grid[currentX - 1, currentY].Visited) {
+                    ChangeColor(curChecking, Color.magenta);
                     Destroy(curChecking.GetWall(direction));
                     curChecking.RemoveWall(direction);
                     generator.Grid[currentX - 1, currentY].RemoveWall(RoomData.WallDir.East);
                     path.Add(generator.Grid[currentX - 1, currentY]);
                     curChecking = generator.Grid[currentX - 1, currentY];
+                    ChangeColor(curChecking, Color.yellow);
                     curChecking.Visited = true;
                     distance++;
                     curChecking.Distance = distance;
@@ -157,6 +174,10 @@ public class MazeGenerator : MonoBehaviour
 
     private int GetRandomDir(int maxRange) {
         return Random.Range(0, maxRange);
+    }
+
+    private void ChangeColor(RoomData room, Color color) {
+        room.gameObject.GetComponent<MeshRenderer>().material.color = color;
     }
 
     /* #1 get a random starting room
