@@ -6,8 +6,10 @@ public class MazeGenerator : MonoBehaviour
 {
     private GridGenerator generator;
     private RoomData curChecking;
+    private RoomData startRoom;
     private List<RoomData> path;
     private List<RoomData> outside;
+    private int distance = 0;
     private int currentX = 0;
     private int currentY = 0;
 
@@ -15,6 +17,22 @@ public class MazeGenerator : MonoBehaviour
     void Start()
     {
         generator = FindObjectOfType<GridGenerator>();
+    }
+
+    public void MakeEnds() {
+        List<RoomData> rankList = new List<RoomData>();
+        rankList.Add(startRoom);
+        for (int i = 0; i < outside.Count; i++) {
+            for (int j = 0; j < rankList.Count; j++) {
+                if (outside[i].Distance > rankList[j].Distance) {
+                    rankList.Insert(j, outside[i]);
+                } else {
+                    rankList.Add(outside[i]);
+                }
+            }
+        }
+        startRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+        rankList[Random.Range(0, (int)rankList.Count / 2)].gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
     }
 
     private void GetRandomStart() {
@@ -47,18 +65,19 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
-        curChecking.gameObject.GetComponent<MeshRenderer>().material.color = Color.cyan;
         curChecking.Visited = true;
+        curChecking.Distance = distance;
         path.Add(curChecking);
+        startRoom = curChecking;
     }
 
     public void GenerateMaze() {
         path = new List<RoomData>();
         GetRandomStart(); //Get a random starting room
         while (path.Count > 0) {
-            char[] test = curChecking.name.ToCharArray();
-            currentX = (int)char.GetNumericValue(test[0]);
-            currentY = (int)char.GetNumericValue(test[1]);
+            char[] name = curChecking.name.ToCharArray();
+            currentX = (int)char.GetNumericValue(name[0]);
+            currentY = (int)char.GetNumericValue(name[1]);
             List<RoomData.WallDir> directions = new List<RoomData.WallDir>(); //from my current room what directions can i go to
             for (int i = 0; i < 4; i++) {
                 if (curChecking.ContainsWall((RoomData.WallDir)i)) { //als de kamer nog die muur heeft
@@ -72,6 +91,7 @@ public class MazeGenerator : MonoBehaviour
                 curChecking = path[path.Count - 1]; //en ga naar de vorige kamer
             }
         }
+        MakeEnds();
     }
 
     private void CheckRoom(RoomData.WallDir direction) {
@@ -84,6 +104,8 @@ public class MazeGenerator : MonoBehaviour
                     path.Add(generator.Grid[currentX, currentY + 1]); //voeg de volgende kamer toe aan het pad
                     curChecking = generator.Grid[currentX, currentY + 1]; //zet die kamer als de huidige die gecheckt word
                     curChecking.Visited = true;
+                    distance++;
+                    curChecking.Distance = distance;
                 } else {
                     curChecking.RemoveWall(direction);
                 }
@@ -96,6 +118,8 @@ public class MazeGenerator : MonoBehaviour
                     path.Add(generator.Grid[currentX + 1, currentY]);
                     curChecking = generator.Grid[currentX + 1, currentY];
                     curChecking.Visited = true;
+                    distance++;
+                    curChecking.Distance = distance;
                 } else {
                     curChecking.RemoveWall(direction);
                 }
@@ -108,6 +132,8 @@ public class MazeGenerator : MonoBehaviour
                     path.Add(generator.Grid[currentX, currentY - 1]);
                     curChecking = generator.Grid[currentX, currentY - 1];
                     curChecking.Visited = true;
+                    distance++;
+                    curChecking.Distance = distance;
                 } else {
                     curChecking.RemoveWall(direction);
                 }
@@ -120,6 +146,8 @@ public class MazeGenerator : MonoBehaviour
                     path.Add(generator.Grid[currentX - 1, currentY]);
                     curChecking = generator.Grid[currentX - 1, currentY];
                     curChecking.Visited = true;
+                    distance++;
+                    curChecking.Distance = distance;
                 } else {
                     curChecking.RemoveWall(direction);
                 }
