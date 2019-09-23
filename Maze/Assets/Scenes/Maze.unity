@@ -998,7 +998,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2062676636}
+      - m_Target: {fileID: 2062676638}
         m_MethodName: Generate
         m_Mode: 1
         m_Arguments:
@@ -1435,8 +1435,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2062676635}
+  - component: {fileID: 2062676638}
   - component: {fileID: 2062676634}
   - component: {fileID: 2062676636}
+  - component: {fileID: 2062676637}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1487,3 +1489,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   widthInput: {fileID: 276974736}
   heightInput: {fileID: 2014468697}
+--- !u!114 &2062676637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062676633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63d327baaa6973b47be95fd13da3a655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2062676638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062676633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53757e84cfa48db4aaf2f121234efca0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

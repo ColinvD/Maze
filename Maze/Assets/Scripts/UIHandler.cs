@@ -9,15 +9,19 @@ public class UIHandler : MonoBehaviour
     private InputField widthInput;
     [SerializeField]
     private InputField heightInput;
-    private GridGenerator generator;
+    private GameManager manager;
 
     // Start is called before the first frame update
     void Start()
     {
-        generator = FindObjectOfType<GridGenerator>();
+        manager = FindObjectOfType<GameManager>();
     }
 
-    public void Generate() {
-        generator.GenerateMaze(int.Parse(widthInput.text), int.Parse(heightInput.text));
+    public int GetWidthInput() {
+        return int.Parse(widthInput.text);
+    }
+
+    public int GetHeightInput() {
+        return int.Parse(heightInput.text);
     }
 }

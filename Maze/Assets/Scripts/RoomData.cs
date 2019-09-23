@@ -33,4 +33,16 @@ public class RoomData : MonoBehaviour
     public void AddWall(WallDir direction, GameObject wall) {
         walls.Add(direction, wall);
     }
+
+    public void RemoveWall(WallDir direction) {
+        walls.Remove(direction);
+    }
+
+    public bool ContainsWall(WallDir direction) {
+        return walls.ContainsKey(direction);
+    }
+
+    public GameObject GetWall(WallDir direction) {
+        return walls[direction];
+    }
 }

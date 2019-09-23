@@ -58,6 +58,7 @@ public class GridGenerator : MonoBehaviour
             for (int j = 0; j < height; j++) {
                 Vector3 pos = new Vector3(i * 2, 0, j * 2);
                 GameObject mazeRoom = Instantiate(room, pos, new Quaternion(), mazeParent);
+                mazeRoom.name = "" + i + j;
                 grid[i, j] = mazeRoom.GetComponent<RoomData>();
             }
         }
