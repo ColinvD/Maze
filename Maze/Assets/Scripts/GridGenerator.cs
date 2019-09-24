@@ -42,6 +42,7 @@ public class GridGenerator : MonoBehaviour
     }
 
     public void GenerateGrid(int newWidth, int newHeight) { // maakt de hele grid aan
+        DestroyMaze();
         Width = newWidth;
         Height = newHeight;
         Grid = new RoomData[_width, _height];

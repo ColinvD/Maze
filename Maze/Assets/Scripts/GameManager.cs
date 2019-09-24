@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void Generate() { // maakt de volledige maze
+        StopCoroutine(_mazeGen.GenerateMazeAnim());
         _gridGen.GenerateGrid(_uihandler.GetWidthInput(), _uihandler.GetHeightInput());
         _camSetter.SetCameraPos(_gridGen.Width, _gridGen.Height);
         if (_uihandler.GetAnimation()) {
