@@ -10,57 +10,53 @@ public class RoomData : MonoBehaviour
         West,
         South
     }
-    private Dictionary<WallDir, GameObject> walls;
-    public List<WallDir> test;
-    private int distance;
-    private int gridX;
-    private int gridY;
-    private bool visited = false;
+    private Dictionary<WallDir, GameObject> _walls;
+    private int _distance;
+    private int _gridX;
+    private int _gridY;
+    private bool _visited = false;
     public int Distance {
-        get { return distance; }
+        get { return _distance; }
         set {
-            distance = value;
+            _distance = value;
         }
     }
     public int GridX {
-        get { return gridX; }
+        get { return _gridX; }
         set {
-            gridX = value;
+            _gridX = value;
         }
     }
     public int GridY {
-        get { return gridY; }
+        get { return _gridY; }
         set {
-            gridY = value;
+            _gridY = value;
         }
     }
     public bool Visited {
-        get { return visited; }
+        get { return _visited; }
         set {
-            visited = value;
+            _visited = value;
         }
     }
 
     public void InitializeData() {
-        walls = new Dictionary<WallDir, GameObject>();
-        test = new List<WallDir>();
+        _walls = new Dictionary<WallDir, GameObject>();
     }
 
     public void AddWall(WallDir direction, GameObject wall) {
-        walls.Add(direction, wall);
-        test.Add(direction);
+        _walls.Add(direction, wall);
     }
 
     public void RemoveWall(WallDir direction) {
-        walls.Remove(direction);
-        test.Remove(direction);
+        _walls.Remove(direction);
     }
 
     public bool ContainsWall(WallDir direction) {
-        return walls.ContainsKey(direction);
+        return _walls.ContainsKey(direction);
     }
 
     public GameObject GetWall(WallDir direction) {
-        return walls[direction];
+        return _walls[direction];
     }
 }

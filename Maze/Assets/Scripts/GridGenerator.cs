@@ -4,99 +4,98 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
-    private int width = 5;
-    private int height = 5;
-    private RoomData[,] grid;
+    private int _width = 5;
+    private int _height = 5;
+    private RoomData[,] _grid;
     [SerializeField]
-    private GameObject room;
+    private GameObject _room;
     [SerializeField]
-    private GameObject wall;
+    private GameObject _wall;
     [SerializeField]
-    private Transform mazeParent;
-    private GameObject[,] horizontalWalls;
-    private GameObject[,] verticalWalls;
+    private Transform _mazeParent;
+    private GameObject[,] _horizontalWalls;
+    private GameObject[,] _verticalWalls;
 
     public int Width {
-        get { return width; }
+        get { return _width; }
         set {
-            width = value;
+            _width = value;
         }
     }
     public int Height {
-        get { return height; }
+        get { return _height; }
         set {
-            height = value;
+            _height = value;
         }
     }
     public RoomData[,] Grid {
-        get { return grid; }
+        get { return _grid; }
         private set {
-            grid = value;
+            _grid = value;
         }
     }
 
-    private void DestroyMaze() {
-        foreach (Transform child in mazeParent) {
+    private void DestroyMaze() { // vernietig de vorige maze
+        foreach (Transform child in _mazeParent) {
             Destroy(child.gameObject);
         }
     }
 
-    public void GenerateMaze(int newWidth, int newHeight) {
-        DestroyMaze();
+    public void GenerateGrid(int newWidth, int newHeight) { // maakt de hele grid aan
         Width = newWidth;
         Height = newHeight;
-        Grid = new RoomData[width, height];
-        horizontalWalls = new GameObject[width, height + 1];
-        verticalWalls = new GameObject[width + 1, height];
+        Grid = new RoomData[_width, _height];
+        _horizontalWalls = new GameObject[_width, _height + 1];
+        _verticalWalls = new GameObject[_width + 1, _height];
         SpawnRooms();
         SpawnWalls();
         InitializeRooms();
     }
 
-    private void SpawnRooms() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+    private void SpawnRooms() { // spawnt de fysieke kamers in de wereld
+        for (int i = 0; i < _width; i++) {
+            for (int j = 0; j < _height; j++) {
                 Vector3 pos = new Vector3(i * 2, 0, j * 2);
-                GameObject mazeRoom = Instantiate(room, pos, new Quaternion(), mazeParent);
+                GameObject mazeRoom = Instantiate(_room, pos, new Quaternion(), _mazeParent);
                 mazeRoom.name = "" + i + j;
-                grid[i, j] = mazeRoom.GetComponent<RoomData>();
-                grid[i, j].GridX = i;
-                grid[i, j].GridY = j;
+                _grid[i, j] = mazeRoom.GetComponent<RoomData>();
+                _grid[i, j].GridX = i;
+                _grid[i, j].GridY = j;
             }
         }
     }
 
-    private void SpawnWalls() {
-        //horizontal
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j <= height; j++) {
+    private void SpawnWalls() { // spawnt de fysieke muren in de wereld
+        // horizontal
+        for (int i = 0; i < _width; i++) {
+            for (int j = 0; j <= _height; j++) {
                 Vector3 pos = new Vector3(i * 2, 0, -1f + j * 2);
-                GameObject mazeWall = Instantiate(wall, pos, new Quaternion(), mazeParent);
+                GameObject mazeWall = Instantiate(_wall, pos, new Quaternion(), _mazeParent);
                 mazeWall.transform.localScale = new Vector3(2.5f, 1, 0.5f);
-                horizontalWalls[i,j] = mazeWall;
+                _horizontalWalls[i,j] = mazeWall;
             }
         }
 
-        //vertical
-        for (int i = 0; i <= width; i++) {
-            for (int j = 0; j < height; j++) {
+        // vertical
+        for (int i = 0; i <= _width; i++) {
+            for (int j = 0; j < _height; j++) {
                 Vector3 pos = new Vector3(-1f + i * 2, 0, j * 2);
-                GameObject mazeWall = Instantiate(wall, pos, new Quaternion(), mazeParent);
+                GameObject mazeWall = Instantiate(_wall, pos, new Quaternion(), _mazeParent);
                 mazeWall.transform.localScale = new Vector3(0.5f, 1, 2.5f);
-                verticalWalls[i, j] = mazeWall;
+                _verticalWalls[i, j] = mazeWall;
             }
         }
     }
 
-    private void InitializeRooms() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                RoomData data = grid[i, j].GetComponent<RoomData>();
+    private void InitializeRooms() { // stelt voor elke kamer 4 muren in
+        for (int i = 0; i < _width; i++) {
+            for (int j = 0; j < _height; j++) {
+                RoomData data = _grid[i, j].GetComponent<RoomData>();
                 data.InitializeData();
-                data.AddWall(RoomData.WallDir.North, horizontalWalls[i, j + 1]);
-                data.AddWall(RoomData.WallDir.East, verticalWalls[i+1, j]);
-                data.AddWall(RoomData.WallDir.South, horizontalWalls[i, j]);
-                data.AddWall(RoomData.WallDir.West, verticalWalls[i, j]);
+                data.AddWall(RoomData.WallDir.North, _horizontalWalls[i, j + 1]);
+                data.AddWall(RoomData.WallDir.East, _verticalWalls[i+1, j]);
+                data.AddWall(RoomData.WallDir.South, _horizontalWalls[i, j]);
+                data.AddWall(RoomData.WallDir.West, _verticalWalls[i, j]);
             }
         }
     }

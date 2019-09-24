@@ -4,30 +4,32 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private GridGenerator gridGen;
-    private MazeGenerator mazeGen;
-    private UIHandler uihandler;
-    private CameraSetter camSetter;
-
-    // Start is called before the first frame update
+    private GridGenerator _gridGen;
+    private MazeGenerator _mazeGen;
+    private UIHandler _uihandler;
+    private CameraSetter _camSetter;
+    
     void Start()
     {
-        gridGen = GetComponent<GridGenerator>();
-        mazeGen = GetComponent<MazeGenerator>();
-        uihandler = GetComponent<UIHandler>();
-        camSetter = GetComponent<CameraSetter>();
+        _gridGen = GetComponent<GridGenerator>();
+        _mazeGen = GetComponent<MazeGenerator>();
+        _uihandler = GetComponent<UIHandler>();
+        _camSetter = GetComponent<CameraSetter>();
+    }
+    
+    void Update() {
+        _mazeGen.SetSpeed(_uihandler.GetSpeed());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public void Generate() {
-        gridGen.GenerateMaze(uihandler.GetWidthInput(), uihandler.GetHeightInput());
-        camSetter.SetCameraPos(gridGen.Width, gridGen.Height);
-        //StartCoroutine(mazeGen.GenerateMazeAnim());
-        mazeGen.GenerateMaze();
+    public void Generate() { // maakt de volledige maze
+        _gridGen.GenerateGrid(_uihandler.GetWidthInput(), _uihandler.GetHeightInput());
+        _camSetter.SetCameraPos(_gridGen.Width, _gridGen.Height);
+        if (_uihandler.GetAnimation()) {
+            StartCoroutine(_mazeGen.GenerateMazeAnim());
+        } else {
+            _uihandler.SetSpeed(1);
+            _mazeGen.GenerateMaze();
+        }
+        _mazeGen.SetSpeed(1);
     }
 }

@@ -6,22 +6,31 @@ using UnityEngine.UI;
 public class UIHandler : MonoBehaviour
 {
     [SerializeField]
-    private InputField widthInput;
+    private InputField _widthInput;
     [SerializeField]
-    private InputField heightInput;
-    private GameManager manager;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        manager = FindObjectOfType<GameManager>();
-    }
+    private InputField _heightInput;
+    [SerializeField]
+    private Toggle _mazeAnimation;
+    [SerializeField]
+    private Slider _speed;
 
     public int GetWidthInput() {
-        return int.Parse(widthInput.text);
+        return int.Parse(_widthInput.text);
     }
 
     public int GetHeightInput() {
-        return int.Parse(heightInput.text);
+        return int.Parse(_heightInput.text);
+    }
+
+    public bool GetAnimation() {
+        return _mazeAnimation.isOn;
+    }
+
+    public float GetSpeed() {
+        return _speed.value;
+    }
+
+    public void SetSpeed(float newSpeed) {
+        _speed.value = newSpeed;
     }
 }

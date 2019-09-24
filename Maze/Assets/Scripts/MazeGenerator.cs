@@ -4,204 +4,212 @@ using UnityEngine;
 
 public class MazeGenerator : MonoBehaviour
 {
-    private GridGenerator generator;
-    private RoomData curChecking;
-    private RoomData startRoom;
-    private RoomData endRoom;
-    private List<RoomData> path;
-    private List<RoomData> outside;
-    private int distance = 0;
-    private int currentX = 0;
-    private int currentY = 0;
-
-    // Start is called before the first frame update
+    private GridGenerator _generator;
+    private RoomData _curChecking;
+    private RoomData _startRoom;
+    private RoomData _endRoom;
+    private List<RoomData> _path;
+    private List<RoomData> _outside;
+    private int _distance = 0;
+    private int _currentX = 0;
+    private int _currentY = 0;
+    private float _animSpeed = 0.3f;
+    
     void Start()
     {
-        generator = FindObjectOfType<GridGenerator>();
+        _generator = FindObjectOfType<GridGenerator>();
     }
 
-    public void MakeEnds() {
-        if (endRoom == null) {
-            endRoom = startRoom;
-        }
-        for (int i = 0; i < outside.Count; i++) {
-            if(outside[i].Distance > endRoom.Distance) {
-                endRoom = outside[i];
+    private void MakeEnds() { // maakt de start en einde van de maze
+        _endRoom = null;
+        while (_endRoom == null) {
+            RoomData temp = _startRoom;
+            for (int i = 0; i < _outside.Count; i++) {
+                if (_outside[i].Distance >= temp.Distance) {
+                    temp = _outside[i];
+                }
+            }
+            if (temp != _startRoom) {
+                _endRoom = temp;
             }
         }
-        startRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
-        endRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+        _startRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+        _endRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
     }
 
-    private void GetRandomStart() {
-        outside = new List<RoomData>();
-        for (int i = 0; i < generator.Width; i++) {
-            for (int j = 0; j < generator.Height; j++) {
-                if (i == 0 || i == generator.Width - 1 || j == 0 || j == generator.Height - 1) {
-                    outside.Add(generator.Grid[i, j]);
+    private void GetRandomStart() { // pakt een random start kamer van de buitenrand
+        _outside = new List<RoomData>();
+        for (int i = 0; i < _generator.Width; i++) {
+            for (int j = 0; j < _generator.Height; j++) {
+                if (i == 0 || i == _generator.Width - 1 || j == 0 || j == _generator.Height - 1) {
+                    _outside.Add(_generator.Grid[i, j]);
                     if (i == 0) {
-                        generator.Grid[i, j].RemoveWall(RoomData.WallDir.West);
+                        _generator.Grid[i, j].RemoveWall(RoomData.WallDir.West);
                     }
-                    if (i == generator.Width - 1) {
-                        generator.Grid[i, j].RemoveWall(RoomData.WallDir.East);
+                    if (i == _generator.Width - 1) {
+                        _generator.Grid[i, j].RemoveWall(RoomData.WallDir.East);
                     }
                     if (j == 0) {
-                        generator.Grid[i, j].RemoveWall(RoomData.WallDir.South);
+                        _generator.Grid[i, j].RemoveWall(RoomData.WallDir.South);
                     }
-                    if (j == generator.Height - 1) {
-                        generator.Grid[i, j].RemoveWall(RoomData.WallDir.North);
+                    if (j == _generator.Height - 1) {
+                        _generator.Grid[i, j].RemoveWall(RoomData.WallDir.North);
                     }
                 }
             }
         }
-        curChecking = outside[Random.Range(0, outside.Count - 1)];
-        for (int i = 0; i < generator.Width; i++) {
-            for (int j = 0; j < generator.Height; j++) {
-                if (generator.Grid[i,j] == curChecking) {
-                    currentX = i;
-                    currentY = j;
+        _curChecking = _outside[Random.Range(0, _outside.Count - 1)];
+        for (int i = 0; i < _generator.Width; i++) {
+            for (int j = 0; j < _generator.Height; j++) {
+                if (_generator.Grid[i,j] == _curChecking) {
+                    _currentX = i;
+                    _currentY = j;
                 }
             }
         }
-        curChecking.Visited = true;
-        curChecking.Distance = distance;
-        path.Add(curChecking);
-        startRoom = curChecking;
+        _curChecking.Visited = true;
+        _curChecking.Distance = _distance;
+        _path.Add(_curChecking);
+        _startRoom = _curChecking;
     }
 
-    public IEnumerator GenerateMazeAnim() {
-        path = new List<RoomData>();
-        GetRandomStart(); //Get a random starting room
-        while (path.Count > 0) {
-            currentX = curChecking.GridX;
-            currentY = curChecking.GridY;
-            List<RoomData.WallDir> directions = new List<RoomData.WallDir>(); //from my current room what directions can i go to
+    public IEnumerator GenerateMazeAnim() { // maakt de maze in een soort van animatie
+        _path = new List<RoomData>();
+        GetRandomStart();
+        while (_path.Count > 0) {
+            _currentX = _curChecking.GridX;
+            _currentY = _curChecking.GridY;
+            List<RoomData.WallDir> directions = new List<RoomData.WallDir>(); 
             for (int i = 0; i < 4; i++) {
-                if (curChecking.ContainsWall((RoomData.WallDir)i)) { //als de kamer nog die muur heeft
-                    directions.Add((RoomData.WallDir)i); //voeg hem toe aan welke richtingen ik nog kan checken
+                if (_curChecking.ContainsWall((RoomData.WallDir)i)) {
+                    directions.Add((RoomData.WallDir)i);
                 }
             }
-            if (directions.Count != 0) { //checkt als ik nog naar een direction kan
-                ChangeColor(curChecking, Color.yellow);
-                CheckRoom(directions[GetRandomDir(directions.Count)]); //check die direction
-            } else if (path.Count - 1 > 0) {
-                ChangeColor(curChecking, Color.white);
-                distance--;
-                path.Remove(path[path.Count - 1]); //haal deze kamer uit het pad
-                curChecking = path[path.Count - 1]; //en ga naar de vorige kamer
-                ChangeColor(curChecking, Color.yellow);
+            if (directions.Count != 0) {
+                ChangeColor(_curChecking, Color.yellow);
+                CheckRoom(directions[GetRandomDir(directions.Count)]);
+            } else if (_path.Count - 1 > 0) {
+                ChangeColor(_curChecking, Color.white);
+                _distance--;
+                _path.Remove(_path[_path.Count - 1]);
+                _curChecking = _path[_path.Count - 1];
+                ChangeColor(_curChecking, Color.yellow);
             } else {
-                ChangeColor(curChecking, Color.white);
+                ChangeColor(_curChecking, Color.white);
                 break;
             }
-            yield return new WaitForSeconds(0.0f);
+            yield return new WaitForSeconds(_animSpeed);
         }
         MakeEnds();
     }
 
-    public void GenerateMaze() {
-        path = new List<RoomData>();
-        GetRandomStart(); //Get a random starting room
-        while (path.Count > 0) {
-            currentX = curChecking.GridX;
-            currentY = curChecking.GridY;
-            List<RoomData.WallDir> directions = new List<RoomData.WallDir>(); //from my current room what directions can i go to
+    public void SetSpeed(float newSpeed) { // zet de snelheid van de animatie
+        Time.timeScale = newSpeed;
+    }
+
+    public void GenerateMaze() { // maakt de maze in 1 keer
+        _path = new List<RoomData>();
+        GetRandomStart();
+        while (_path.Count > 0) {
+            _currentX = _curChecking.GridX;
+            _currentY = _curChecking.GridY;
+            List<RoomData.WallDir> directions = new List<RoomData.WallDir>();
             for (int i = 0; i < 4; i++) {
-                if (curChecking.ContainsWall((RoomData.WallDir)i)) { //als de kamer nog die muur heeft
-                    directions.Add((RoomData.WallDir)i); //voeg hem toe aan welke richtingen ik nog kan checken
+                if (_curChecking.ContainsWall((RoomData.WallDir)i)) {
+                    directions.Add((RoomData.WallDir)i);
                 }
             }
-            if (directions.Count != 0) { //checkt als ik nog naar een direction kan
-                ChangeColor(curChecking, Color.yellow);
-                CheckRoom(directions[GetRandomDir(directions.Count)]); //check die direction
-            } else if (path.Count - 1 > 0) {
-                ChangeColor(curChecking, Color.white);
-                distance--;
-                path.Remove(path[path.Count - 1]); //haal deze kamer uit het pad
-                curChecking = path[path.Count - 1]; //en ga naar de vorige kamer
-                ChangeColor(curChecking, Color.yellow);
+            if (directions.Count != 0) {
+                ChangeColor(_curChecking, Color.yellow);
+                CheckRoom(directions[GetRandomDir(directions.Count)]);
+            } else if (_path.Count - 1 > 0) {
+                ChangeColor(_curChecking, Color.white);
+                _distance--;
+                _path.Remove(_path[_path.Count - 1]);
+                _curChecking = _path[_path.Count - 1];
+                ChangeColor(_curChecking, Color.yellow);
             } else {
-                ChangeColor(curChecking, Color.white);
+                ChangeColor(_curChecking, Color.white);
                 break;
             }
         }
         MakeEnds();
     }
 
-    private void CheckRoom(RoomData.WallDir direction) {
+    private void CheckRoom(RoomData.WallDir direction) { // controleert als we wel die richting op kunnen
         switch (direction) {
             case RoomData.WallDir.North:
-                if (!generator.Grid[currentX,currentY + 1].Visited) { //als hij nog niet is bezocht
-                    ChangeColor(curChecking, Color.magenta);
-                    Destroy(curChecking.GetWall(direction)); //muur vernietigen
-                    curChecking.RemoveWall(direction); //haal bij de huidige kamer de muur weg
-                    generator.Grid[currentX, currentY + 1].RemoveWall(RoomData.WallDir.South); //haal bij de volgende kamer dezelfde muur weg
-                    path.Add(generator.Grid[currentX, currentY + 1]); //voeg de volgende kamer toe aan het pad
-                    curChecking = generator.Grid[currentX, currentY + 1]; //zet die kamer als de huidige die gecheckt word
-                    ChangeColor(curChecking, Color.yellow);
-                    curChecking.Visited = true;
-                    distance++;
-                    curChecking.Distance = distance;
+                if (!_generator.Grid[_currentX,_currentY + 1].Visited) {
+                    ChangeColor(_curChecking, Color.magenta);
+                    Destroy(_curChecking.GetWall(direction));
+                    _curChecking.RemoveWall(direction);
+                    _generator.Grid[_currentX, _currentY + 1].RemoveWall(RoomData.WallDir.South);
+                    _path.Add(_generator.Grid[_currentX, _currentY + 1]);
+                    _curChecking = _generator.Grid[_currentX, _currentY + 1];
+                    ChangeColor(_curChecking, Color.yellow);
+                    _curChecking.Visited = true;
+                    _distance++;
+                    _curChecking.Distance = _distance;
                 } else {
-                    curChecking.RemoveWall(direction);
+                    _curChecking.RemoveWall(direction);
                 }
                 break;
             case RoomData.WallDir.East:
-                if (!generator.Grid[currentX + 1, currentY].Visited) {
-                    ChangeColor(curChecking, Color.magenta);
-                    Destroy(curChecking.GetWall(direction));
-                    curChecking.RemoveWall(direction);
-                    generator.Grid[currentX + 1, currentY].RemoveWall(RoomData.WallDir.West);
-                    path.Add(generator.Grid[currentX + 1, currentY]);
-                    curChecking = generator.Grid[currentX + 1, currentY];
-                    ChangeColor(curChecking, Color.yellow);
-                    curChecking.Visited = true;
-                    distance++;
-                    curChecking.Distance = distance;
+                if (!_generator.Grid[_currentX + 1, _currentY].Visited) {
+                    ChangeColor(_curChecking, Color.magenta);
+                    Destroy(_curChecking.GetWall(direction));
+                    _curChecking.RemoveWall(direction);
+                    _generator.Grid[_currentX + 1, _currentY].RemoveWall(RoomData.WallDir.West);
+                    _path.Add(_generator.Grid[_currentX + 1, _currentY]);
+                    _curChecking = _generator.Grid[_currentX + 1, _currentY];
+                    ChangeColor(_curChecking, Color.yellow);
+                    _curChecking.Visited = true;
+                    _distance++;
+                    _curChecking.Distance = _distance;
                 } else {
-                    curChecking.RemoveWall(direction);
+                    _curChecking.RemoveWall(direction);
                 }
                 break;
             case RoomData.WallDir.South:
-                if (!generator.Grid[currentX, currentY - 1].Visited) {
-                    ChangeColor(curChecking, Color.magenta);
-                    Destroy(curChecking.GetWall(direction));
-                    curChecking.RemoveWall(direction);
-                    generator.Grid[currentX, currentY - 1].RemoveWall(RoomData.WallDir.North);
-                    path.Add(generator.Grid[currentX, currentY - 1]);
-                    curChecking = generator.Grid[currentX, currentY - 1];
-                    ChangeColor(curChecking, Color.yellow);
-                    curChecking.Visited = true;
-                    distance++;
-                    curChecking.Distance = distance;
+                if (!_generator.Grid[_currentX, _currentY - 1].Visited) {
+                    ChangeColor(_curChecking, Color.magenta);
+                    Destroy(_curChecking.GetWall(direction));
+                    _curChecking.RemoveWall(direction);
+                    _generator.Grid[_currentX, _currentY - 1].RemoveWall(RoomData.WallDir.North);
+                    _path.Add(_generator.Grid[_currentX, _currentY - 1]);
+                    _curChecking = _generator.Grid[_currentX, _currentY - 1];
+                    ChangeColor(_curChecking, Color.yellow);
+                    _curChecking.Visited = true;
+                    _distance++;
+                    _curChecking.Distance = _distance;
                 } else {
-                    curChecking.RemoveWall(direction);
+                    _curChecking.RemoveWall(direction);
                 }
                 break;
             case RoomData.WallDir.West:
-                if (!generator.Grid[currentX - 1, currentY].Visited) {
-                    ChangeColor(curChecking, Color.magenta);
-                    Destroy(curChecking.GetWall(direction));
-                    curChecking.RemoveWall(direction);
-                    generator.Grid[currentX - 1, currentY].RemoveWall(RoomData.WallDir.East);
-                    path.Add(generator.Grid[currentX - 1, currentY]);
-                    curChecking = generator.Grid[currentX - 1, currentY];
-                    ChangeColor(curChecking, Color.yellow);
-                    curChecking.Visited = true;
-                    distance++;
-                    curChecking.Distance = distance;
+                if (!_generator.Grid[_currentX - 1, _currentY].Visited) {
+                    ChangeColor(_curChecking, Color.magenta);
+                    Destroy(_curChecking.GetWall(direction));
+                    _curChecking.RemoveWall(direction);
+                    _generator.Grid[_currentX - 1, _currentY].RemoveWall(RoomData.WallDir.East);
+                    _path.Add(_generator.Grid[_currentX - 1, _currentY]);
+                    _curChecking = _generator.Grid[_currentX - 1, _currentY];
+                    ChangeColor(_curChecking, Color.yellow);
+                    _curChecking.Visited = true;
+                    _distance++;
+                    _curChecking.Distance = _distance;
                 } else {
-                    curChecking.RemoveWall(direction);
+                    _curChecking.RemoveWall(direction);
                 }
                 break;
         }
     }
 
-    private int GetRandomDir(int maxRange) {
+    private int GetRandomDir(int maxRange) { // geeft een random richting terug
         return Random.Range(0, maxRange);
     }
 
-    private void ChangeColor(RoomData room, Color color) {
+    private void ChangeColor(RoomData room, Color color) { // veranderd de kamer kleur
         room.gameObject.GetComponent<MeshRenderer>().material.color = color;
     }
 
