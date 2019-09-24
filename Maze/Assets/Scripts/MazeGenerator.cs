@@ -6,12 +6,10 @@ public class MazeGenerator : MonoBehaviour
 {
     private GridGenerator generator;
     private RoomData curChecking;
-    [SerializeField]
     private RoomData startRoom;
     private RoomData endRoom;
     private List<RoomData> path;
     private List<RoomData> outside;
-    //private List<RoomData> rankList;
     private int distance = 0;
     private int currentX = 0;
     private int currentY = 0;
@@ -71,13 +69,12 @@ public class MazeGenerator : MonoBehaviour
         startRoom = curChecking;
     }
 
-    public IEnumerator GenerateMaze() {
+    public IEnumerator GenerateMazeAnim() {
         path = new List<RoomData>();
         GetRandomStart(); //Get a random starting room
         while (path.Count > 0) {
-            char[] name = curChecking.name.ToCharArray();
-            currentX = (int)char.GetNumericValue(name[0]);
-            currentY = (int)char.GetNumericValue(name[1]);
+            currentX = curChecking.GridX;
+            currentY = curChecking.GridY;
             List<RoomData.WallDir> directions = new List<RoomData.WallDir>(); //from my current room what directions can i go to
             for (int i = 0; i < 4; i++) {
                 if (curChecking.ContainsWall((RoomData.WallDir)i)) { //als de kamer nog die muur heeft
@@ -96,9 +93,37 @@ public class MazeGenerator : MonoBehaviour
             } else {
                 ChangeColor(curChecking, Color.white);
                 break;
-                path.Remove(path[path.Count - 1]);
             }
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.0f);
+        }
+        MakeEnds();
+    }
+
+    public void GenerateMaze() {
+        path = new List<RoomData>();
+        GetRandomStart(); //Get a random starting room
+        while (path.Count > 0) {
+            currentX = curChecking.GridX;
+            currentY = curChecking.GridY;
+            List<RoomData.WallDir> directions = new List<RoomData.WallDir>(); //from my current room what directions can i go to
+            for (int i = 0; i < 4; i++) {
+                if (curChecking.ContainsWall((RoomData.WallDir)i)) { //als de kamer nog die muur heeft
+                    directions.Add((RoomData.WallDir)i); //voeg hem toe aan welke richtingen ik nog kan checken
+                }
+            }
+            if (directions.Count != 0) { //checkt als ik nog naar een direction kan
+                ChangeColor(curChecking, Color.yellow);
+                CheckRoom(directions[GetRandomDir(directions.Count)]); //check die direction
+            } else if (path.Count - 1 > 0) {
+                ChangeColor(curChecking, Color.white);
+                distance--;
+                path.Remove(path[path.Count - 1]); //haal deze kamer uit het pad
+                curChecking = path[path.Count - 1]; //en ga naar de vorige kamer
+                ChangeColor(curChecking, Color.yellow);
+            } else {
+                ChangeColor(curChecking, Color.white);
+                break;
+            }
         }
         MakeEnds();
     }

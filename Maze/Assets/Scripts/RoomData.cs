@@ -13,11 +13,25 @@ public class RoomData : MonoBehaviour
     private Dictionary<WallDir, GameObject> walls;
     public List<WallDir> test;
     private int distance;
+    private int gridX;
+    private int gridY;
     private bool visited = false;
     public int Distance {
         get { return distance; }
         set {
             distance = value;
+        }
+    }
+    public int GridX {
+        get { return gridX; }
+        set {
+            gridX = value;
+        }
+    }
+    public int GridY {
+        get { return gridY; }
+        set {
+            gridY = value;
         }
     }
     public bool Visited {
