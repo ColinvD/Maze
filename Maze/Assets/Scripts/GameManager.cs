@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     private MazeGenerator _mazeGen;
     private UIHandler _uihandler;
     private CameraSetter _camSetter;
+    private PlayerSpawner _playerSpawner;
+    private bool _generating = false;
     
     void Start()
     {
@@ -15,22 +17,39 @@ public class GameManager : MonoBehaviour
         _mazeGen = GetComponent<MazeGenerator>();
         _uihandler = GetComponent<UIHandler>();
         _camSetter = GetComponent<CameraSetter>();
+        _playerSpawner = GetComponent<PlayerSpawner>();
+        _mazeGen.mazeGenerated += PlayGame;
     }
     
     void Update() {
-        _mazeGen.SetSpeed(_uihandler.GetSpeed());
+        if (_generating) {
+            SetSpeed(_uihandler.GetSpeed());
+        }
     }
 
     public void Generate() { // maakt de volledige maze
         StopCoroutine(_mazeGen.GenerateMazeAnim());
+        _mazeGen.DestroyMaze(_gridGen.MazeParent);
+        _playerSpawner.DestroyPlayer();
         _gridGen.GenerateGrid(_uihandler.GetWidthInput(), _uihandler.GetHeightInput());
         _camSetter.SetCameraPos(_gridGen.Width, _gridGen.Height);
         if (_uihandler.GetAnimation()) {
+            _generating = true;
             StartCoroutine(_mazeGen.GenerateMazeAnim());
         } else {
             _uihandler.SetSpeed(1);
+            _generating = false;
             _mazeGen.GenerateMaze();
         }
-        _mazeGen.SetSpeed(1);
+    }
+
+    private void PlayGame() {
+        SetSpeed(1);
+        _generating = false;
+        _playerSpawner.SpawnPlayer(_mazeGen.StartroomPos);
+    }
+
+    public void SetSpeed(float newSpeed) { // zet de snelheid van de animatie
+        Time.timeScale = newSpeed;
     }
 }

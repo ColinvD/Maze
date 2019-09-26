@@ -14,6 +14,11 @@ public class MazeGenerator : MonoBehaviour
     private int _currentX = 0;
     private int _currentY = 0;
     private float _animSpeed = 0.3f;
+    public delegate void Generated();
+    public Generated mazeGenerated;
+    public Transform StartroomPos {
+        get { return _startRoom.transform; }
+    }
     
     void Start()
     {
@@ -35,6 +40,7 @@ public class MazeGenerator : MonoBehaviour
         }
         _startRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
         _endRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+        mazeGenerated();
     }
 
     private void GetRandomStart() { // pakt een random start kamer van de buitenrand
@@ -101,10 +107,6 @@ public class MazeGenerator : MonoBehaviour
             yield return new WaitForSeconds(_animSpeed);
         }
         MakeEnds();
-    }
-
-    public void SetSpeed(float newSpeed) { // zet de snelheid van de animatie
-        Time.timeScale = newSpeed;
     }
 
     public void GenerateMaze() { // maakt de maze in 1 keer
@@ -211,6 +213,12 @@ public class MazeGenerator : MonoBehaviour
 
     private void ChangeColor(RoomData room, Color color) { // veranderd de kamer kleur
         room.gameObject.GetComponent<MeshRenderer>().material.color = color;
+    }
+    
+    public void DestroyMaze(Transform mazeParent) { // vernietig de vorige maze
+        foreach (Transform child in mazeParent) {
+            Destroy(child.gameObject);
+        }
     }
 
     /* #1 get a random starting room

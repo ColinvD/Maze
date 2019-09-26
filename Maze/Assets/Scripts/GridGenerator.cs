@@ -34,15 +34,11 @@ public class GridGenerator : MonoBehaviour
             _grid = value;
         }
     }
-
-    private void DestroyMaze() { // vernietig de vorige maze
-        foreach (Transform child in _mazeParent) {
-            Destroy(child.gameObject);
-        }
+    public Transform MazeParent {
+        get { return _mazeParent; }
     }
 
     public void GenerateGrid(int newWidth, int newHeight) { // maakt de hele grid aan
-        DestroyMaze();
         Width = newWidth;
         Height = newHeight;
         Grid = new RoomData[_width, _height];
@@ -70,9 +66,9 @@ public class GridGenerator : MonoBehaviour
         // horizontal
         for (int i = 0; i < _width; i++) {
             for (int j = 0; j <= _height; j++) {
-                Vector3 pos = new Vector3(i * 2, 0, -1f + j * 2);
+                Vector3 pos = new Vector3(i * 2, 1.5f, -1f + j * 2);
                 GameObject mazeWall = Instantiate(_wall, pos, new Quaternion(), _mazeParent);
-                mazeWall.transform.localScale = new Vector3(2.5f, 1, 0.5f);
+                mazeWall.transform.localScale = new Vector3(2.5f, 3, 0.5f);
                 _horizontalWalls[i,j] = mazeWall;
             }
         }
@@ -80,9 +76,9 @@ public class GridGenerator : MonoBehaviour
         // vertical
         for (int i = 0; i <= _width; i++) {
             for (int j = 0; j < _height; j++) {
-                Vector3 pos = new Vector3(-1f + i * 2, 0, j * 2);
+                Vector3 pos = new Vector3(-1f + i * 2, 1.5f, j * 2);
                 GameObject mazeWall = Instantiate(_wall, pos, new Quaternion(), _mazeParent);
-                mazeWall.transform.localScale = new Vector3(0.5f, 1, 2.5f);
+                mazeWall.transform.localScale = new Vector3(0.5f, 3, 2.5f);
                 _verticalWalls[i, j] = mazeWall;
             }
         }
