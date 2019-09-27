@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class CameraZoom : MonoBehaviour
 {
-    private float _minZoom;
-    private float _maxZoom;
+    private float _minZoom = 1;
+    private float _maxZoom = 1;
+    private float _curZoom;
     public float minZoom {
         get { return _minZoom; }
         set {
@@ -16,6 +17,12 @@ public class CameraZoom : MonoBehaviour
         get { return _maxZoom; }
         set {
             _maxZoom = value;
+        }
+    }
+    public float curZoom {
+        get { return _curZoom; }
+        private set {
+            _curZoom = value;
         }
     }
 
@@ -29,6 +36,7 @@ public class CameraZoom : MonoBehaviour
         }
 
         zoom = Mathf.Clamp(zoom, minZoom, maxZoom);
-        camera.orthographicSize = zoom;
+        _curZoom = zoom;
+        camera.orthographicSize = _curZoom;
     }
 }

@@ -4,36 +4,29 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    private float _minX;
-    private float _minY;
-    private float _maxX;
-    private float _maxY;
-    public float minX {
-        get { return _minX; }
+    private Vector2 _minVec;
+    private Vector2 _maxVec;
+    private Vector2 _midVec;
+    public Vector2 minVec {
+        get { return _minVec; }
         set {
-            _minX = value;
+            _minVec = value;
         }
     }
-    public float minY {
-        get { return _minY; }
+    public Vector2 maxVec {
+        get { return _maxVec; }
         set {
-            _minY = value;
+            _maxVec = value;
         }
     }
-    public float maxX {
-        get { return _maxX; }
+    public Vector2 midVec {
+        get { return _midVec; }
         set {
-            _maxX = value;
-        }
-    }
-    public float maxY {
-        get { return _maxY; }
-        set {
-            _maxY = value;
+            _midVec = value;
         }
     }
 
-    public void EdgeScrolling(Camera camera, float edgeSize, float moveAmount) {
+    public void EdgeScrolling(Camera camera, float edgeSize, float moveAmount, float sizeMin, float sizeMax, float sizeCur) {
         Vector3 newPos = new Vector3(camera.transform.position.x, camera.transform.position.y, camera.transform.position.z);
         if (Input.mousePosition.x > Screen.width - edgeSize) {
             newPos.x += moveAmount * Time.deltaTime;
@@ -47,6 +40,12 @@ public class CameraMovement : MonoBehaviour
         if (Input.mousePosition.y < edgeSize) {
             newPos.z -= moveAmount * Time.deltaTime;
         }
+        float tempX = minVec.x - midVec.x;
+        tempX *= 1 - ((sizeCur - sizeMin) / (sizeMax - sizeMin));
+        float tempY = minVec.y - midVec.y;
+        tempY *= 1 - ((sizeCur - sizeMin) / (sizeMax - sizeMin));
+        newPos.x = Mathf.Clamp(newPos.x, midVec.x + tempX, midVec.x - tempX);
+        newPos.z = Mathf.Clamp(newPos.z, midVec.y + tempY, midVec.y - tempY);
         camera.transform.position = newPos;
     }
 }

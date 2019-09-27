@@ -16,8 +16,7 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SpawnPlayer(Transform position) {
         Vector3 pos = new Vector3(position.position.x, position.position.y + 0.5f, position.position.z);
-        position.position = pos;
-        Player = Instantiate(_playerPrefab, position.position, position.rotation);
+        Player = Instantiate(_playerPrefab, pos, position.rotation);
     }
 
     public void DestroyPlayer() {
