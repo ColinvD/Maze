@@ -40,6 +40,7 @@ public class MazeGenerator : MonoBehaviour
         }
         _startRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
         _endRoom.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+        _endRoom.gameObject.tag = "Finish";
         mazeGenerated();
     }
 
